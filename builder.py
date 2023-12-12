@@ -4,19 +4,11 @@ from collections import namedtuple
 import dgl
 
 from pandas.api.types import (
-    is_categorical,
     is_categorical_dtype,
     is_numeric_dtype,
 )
 
 __all__ = ["PandasGraphBuilder"]
-
-
-def _series_to_tensor(series):
-    if is_categorical(series):
-        return torch.LongTensor(series.cat.codes.values.astype("int64"))
-    else:  # numeric
-        return torch.FloatTensor(series.values)
 
 
 class PandasGraphBuilder(object):
