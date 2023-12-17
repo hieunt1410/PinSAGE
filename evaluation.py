@@ -101,6 +101,8 @@ def evaluate_nn(dataset, h_item, k, batch_size):
     )
 
     recommendations = rec_engine.recommend(g, k, None, h_item).cpu().numpy()
+    print(recommendations.shape)
+    print(recommendations)
     print('Precision@k: ', prec(recommendations, val_matrix), ' | Recall@k: ', recall(recommendations, val_matrix), ' | NDCG@k: ', ndcg(recommendations, val_matrix))
     # print('Precision@k: ', prec(recommendations, val_matrix), ' | Recall@k: ', recall(recommendations, val_matrix))
 
@@ -117,4 +119,4 @@ if __name__ == "__main__":
         dataset = pickle.load(f)
     with open(args.item_embedding_path, "rb") as f:
         emb = torch.FloatTensor(pickle.load(f))
-    print(evaluate_nn(dataset, emb, args.k, args.batch_size))
+    evaluate_nn(dataset, emb, args.k, args.batch_size)
