@@ -13,8 +13,8 @@ def prec(recommendations, ground_truth):
     user_idx = np.repeat(np.arange(n_users), K)
     item_idx = recommendations.flatten()
     relevance = ground_truth[user_idx, item_idx].reshape((n_users, K))
-    hit = relevance.any(axis=1).mean()
-    return hit
+    # hit = relevance.any(axis=1).mean()
+    return hit.mean()
 
 def recall(recommendations, ground_truth):
     n_users, n_items = ground_truth.shape
@@ -22,10 +22,8 @@ def recall(recommendations, ground_truth):
     user_idx = np.repeat(np.arange(n_users), K)
     item_idx = recommendations.flatten()
     relevance = ground_truth[user_idx, item_idx].reshape((n_users, K))
-    relevant_items_per_user = np.sum(relevance, axis=1)
-    recommended_relevant_items_per_user = np.sum(relevance > 0, axis=1)
-    recall_per_user = relevant_items_per_user / np.minimum(recommended_relevant_items_per_user, relevant_items_per_user)
-    recall_at_k = np.mean(recall_per_user)
+    
+    
     return recall_at_k
 
 
@@ -103,6 +101,8 @@ def evaluate_nn(dataset, h_item, k, batch_size):
     recommendations = rec_engine.recommend(g, k, None, h_item).cpu().numpy()
     print(recommendations.shape)
     print(recommendations)
+    print(val_matrix.shape)
+    print(val_matrix)
     print('Precision@k: ', prec(recommendations, val_matrix), ' | Recall@k: ', recall(recommendations, val_matrix), ' | NDCG@k: ', ndcg(recommendations, val_matrix))
     # print('Precision@k: ', prec(recommendations, val_matrix), ' | Recall@k: ', recall(recommendations, val_matrix))
 
