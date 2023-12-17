@@ -16,37 +16,31 @@ def prec(recommendations, ground_truth):
     hit = relevance.any(axis=1).mean()
     return hit
 
-def recall_at_k(recommendations, ground_truth):
-    n_users = ground_truth.shape[0]
-    k = recommendations.shape[1]
-    user_idx = np.repeat(np.arange(n_users), k)
-    item_idx = recommendations[:,:k].flatten()
-    relevance = ground_truth[user_idx, item_idx].reshape((n_users, k))
-    recall = relevance.sum(axis=1) / ground_truth.sum(axis=1)
-    return recall.mean()
+def recall(recommendations, ground_truth):
+    n_users, n_items = ground_truth.shape
+    K = recommendations.shape[1]
+    user_idx = np.repeat(np.arange(n_users), K)
+    item_idx = recommendations.flatten()
+    relevance = ground_truth[user_idx, item_idx].reshape((n_users, K))
+    relevant_items_per_user = np.sum(relevance, axis=1)
+    recommended_relevant_items_per_user = np.sum(relevance > 0, axis=1)
+    recall_per_user = relevant_items_per_user / np.minimum(recommended_relevant_items_per_user, relevant_items_per_user)
+    recall_at_k = np.mean(recall_per_user)
+    return recall_at_k
 
 
 def ndcg(recommendations, ground_truth):
-    n_users = ground_truth.shape[0]
-    k = recommendations.shape[1]
-    user_idx = np.repeat(np.arange(n_users), k)
-    item_idx = recommendations[:,:k].flatten()
-    relevance = ground_truth[user_idx, item_idx].reshape((n_users, k))
-    
-    # Calculate DCG@k
-    ranks = np.arange(1, k + 1)
-    discounts = np.log2(ranks + 1)
-    dcg = np.sum(relevance / discounts, axis=1)
-    
-    # Calculate IDCG@k
-    ideal_relevance = np.sort(ground_truth[:,:k], axis=1)[:, ::-1]
-    idcg = np.sum(ideal_relevance / discounts, axis=1)
-    
-    # Handle cases where IDCG is 0
-    idcg[idcg == 0] = 1
-    
-    ndcg = dcg / idcg
-    return ndcg.mean()
+    n_users, n_items = ground_truth.shape
+    K = recommendations.shape[1]
+    user_idx = np.repeat(np.arange(n_users), K)
+    item_idx = recommendations.flatten()
+    relevance = ground_truth[user_idx, item_idx].reshape((n_users, K))
+    DCG = np.sum(relevance / np.log2(np.arange(2, K + 2)), axis=1)
+    ideal_relevance = -np.sort(-relevance, axis=1)
+    IDCG = np.sum(ideal_relevance / np.log2(np.arange(2, K + 2)), axis=1)
+    ndcg_per_user = DCG / IDCG
+    ndcg_at_k = np.mean(ndcg_per_user)
+    return ndcg_at_k
 
 class LatestNNRecommender(object):
     def __init__(
