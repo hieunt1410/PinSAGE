@@ -35,7 +35,7 @@ def ndcg(recommendations, ground_truth):
     dcg = np.sum(relevance / np.log2(np.arange(2, K + 2)), axis=1)
     ideal_relevance = -np.sort(-relevance, axis=1)
     idcg = np.sum(ideal_relevance / np.log2(np.arange(2, K + 2)), axis=1)
-    ndcg_per_user = dcg / idcg
+    ndcg_per_user = dcg / (idcg + 1e-6)
     ndcg = np.mean(ndcg_per_user)
     return ndcg
 
