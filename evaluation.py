@@ -29,18 +29,18 @@ def recall(recommendations, ground_truth):
 
 def ndcg(recommendations, ground_truth):
     n_users = ground_truth.shape[0]
-    K = recommendations.shape[1]
-    user_idx = np.repeat(np.arange(n_users), K)
-    item_idx = recommendations[:,:K].flatten()
-    relevance = ground_truth[user_idx, item_idx].reshape((n_users, K))
+    k = recommendations.shape[1]
+    user_idx = np.repeat(np.arange(n_users), k)
+    item_idx = recommendations[:,:k].flatten()
+    relevance = ground_truth[user_idx, item_idx].reshape((n_users, k))
     
     # Calculate DCG@k
-    ranks = np.arange(1, K + 1)
+    ranks = np.arange(1, k + 1)
     discounts = np.log2(ranks + 1)
     dcg = np.sum(relevance / discounts, axis=1)
     
     # Calculate IDCG@k
-    ideal_relevance = np.sort(ground_truth[:,:K], axis=1)[:, ::-1]
+    ideal_relevance = np.sort(ground_truth[:,:k], axis=1)[:, ::-1]
     idcg = np.sum(ideal_relevance / discounts, axis=1)
     
     # Handle cases where IDCG is 0
@@ -108,8 +108,8 @@ def evaluate_nn(dataset, h_item, k, batch_size):
     )
 
     recommendations = rec_engine.recommend(g, k, None, h_item).cpu().numpy()
-    # print('Precision@k: ', prec(recommendations, val_matrix), ' | Recall@k: ', recall(recommendations, val_matrix), ' | NDCG@k: ', ndcg(recommendations, val_matrix))
-    print('Precision@k: ', prec(recommendations, val_matrix), ' | Recall@k: ', recall(recommendations, val_matrix))
+    print('Precision@k: ', prec(recommendations, val_matrix), ' | Recall@k: ', recall(recommendations, val_matrix), ' | NDCG@k: ', ndcg(recommendations, val_matrix))
+    # print('Precision@k: ', prec(recommendations, val_matrix), ' | Recall@k: ', recall(recommendations, val_matrix))
 
 
 if __name__ == "__main__":
