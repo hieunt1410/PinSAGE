@@ -13,18 +13,17 @@ def prec(recommendations, ground_truth):
     user_idx = np.repeat(np.arange(n_users), K)
     item_idx = recommendations.flatten()
     relevance = ground_truth[user_idx, item_idx].reshape((n_users, K))
-    # hit = relevance.any(axis=1).mean()
-    return hit.mean()
+    hit = relevance.any(axis=1).mean()
+    return hit
 
 def recall(recommendations, ground_truth):
-    n_users, n_items = ground_truth.shape
+    n_users = ground_truth.shape[0]
     K = recommendations.shape[1]
     user_idx = np.repeat(np.arange(n_users), K)
     item_idx = recommendations.flatten()
     relevance = ground_truth[user_idx, item_idx].reshape((n_users, K))
-    
-    
-    return recall_at_k
+    recall = relevance.sum(axis=1) / ground_truth.sum(axis=1)
+    return recall.mean()
 
 
 def ndcg(recommendations, ground_truth):
@@ -33,12 +32,12 @@ def ndcg(recommendations, ground_truth):
     user_idx = np.repeat(np.arange(n_users), K)
     item_idx = recommendations.flatten()
     relevance = ground_truth[user_idx, item_idx].reshape((n_users, K))
-    DCG = np.sum(relevance / np.log2(np.arange(2, K + 2)), axis=1)
+    dcg = np.sum(relevance / np.log2(np.arange(2, K + 2)), axis=1)
     ideal_relevance = -np.sort(-relevance, axis=1)
-    IDCG = np.sum(ideal_relevance / np.log2(np.arange(2, K + 2)), axis=1)
-    ndcg_per_user = DCG / IDCG
-    ndcg_at_k = np.mean(ndcg_per_user)
-    return ndcg_at_k
+    idcg = np.sum(ideal_relevance / np.log2(np.arange(2, K + 2)), axis=1)
+    ndcg_per_user = dcg / idcg
+    ndcg = np.mean(ndcg_per_user)
+    return ndcg
 
 class LatestNNRecommender(object):
     def __init__(
@@ -99,12 +98,7 @@ def evaluate_nn(dataset, h_item, k, batch_size):
     )
 
     recommendations = rec_engine.recommend(g, k, None, h_item).cpu().numpy()
-    print(recommendations.shape)
-    print(recommendations)
-    print(val_matrix.shape)
-    print(val_matrix)
     print('Precision@k: ', prec(recommendations, val_matrix), ' | Recall@k: ', recall(recommendations, val_matrix), ' | NDCG@k: ', ndcg(recommendations, val_matrix))
-    # print('Precision@k: ', prec(recommendations, val_matrix), ' | Recall@k: ', recall(recommendations, val_matrix))
 
 
 if __name__ == "__main__":
