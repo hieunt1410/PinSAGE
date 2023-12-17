@@ -108,7 +108,8 @@ def evaluate_nn(dataset, h_item, k, batch_size):
     )
 
     recommendations = rec_engine.recommend(g, k, None, h_item).cpu().numpy()
-    print('Precision@k: ', prec(recommendations, val_matrix), ' | Recall@k: ', recall(recommendations, val_matrix), ' | NDCG@k: ', ndcg(recommendations, val_matrix))
+    # print('Precision@k: ', prec(recommendations, val_matrix), ' | Recall@k: ', recall(recommendations, val_matrix), ' | NDCG@k: ', ndcg(recommendations, val_matrix))
+    print('Precision@k: ', prec(recommendations, val_matrix), ' | Recall@k: ', recall(recommendations, val_matrix))
 
 
 if __name__ == "__main__":
