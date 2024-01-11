@@ -164,7 +164,7 @@ if __name__ == "__main__":
         "--device", type=str, default="cpu"
     )  # can also be "cuda:0"
     parser.add_argument("--num-epochs", type=int, default=1)
-    parser.add_argument("--batches-per-epoch", type=int, default=20000)
+    parser.add_argument("--batches-per-epoch", type=int, default=2000)
     parser.add_argument("--num-workers", type=int, default=0)
     parser.add_argument("--lr", type=float, default=3e-5)
     parser.add_argument("-k", type=int, default=10)
