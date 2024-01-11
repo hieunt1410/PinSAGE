@@ -20,7 +20,7 @@ def recall(recommendations, ground_truth):
     n_users = ground_truth.shape[0]
     K = recommendations.shape[1]
     user_idx = np.repeat(np.arange(n_users), K)
-    item_idx = recommendations.flatten()
+    item_idx = recommendations[:,:k].flatten()
     relevance = ground_truth[user_idx, item_idx].reshape((n_users, K))
     recall = relevance.sum(axis=1) / ground_truth.sum(axis=1)
     return recall.mean()
