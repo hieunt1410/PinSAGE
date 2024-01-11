@@ -17,13 +17,15 @@ def prec(recommendations, ground_truth):
     return hit
 
 def recall(recommendations, ground_truth):
-    n_users = ground_truth.shape[0]
+    n_users, n_items = ground_truth.shape
     K = recommendations.shape[1]
     user_idx = np.repeat(np.arange(n_users), K)
-    item_idx = recommendations[:,:K].flatten()
+    item_idx = recommendations.flatten()
     relevance = ground_truth[user_idx, item_idx].reshape((n_users, K))
-    recall = relevance.sum(axis=1) / ground_truth.sum(axis=1)
-    return recall.mean()
+    relevant_items_count = ground_truth.sum(axis=1)
+    relevant_items_in_top_k = relevance.sum(axis=1)
+    recall = (relevant_items_in_top_k / relevant_items_count).mean()
+    return recall
 
 
 def ndcg(recommendations, ground_truth):
